@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="it">
+<head>
+/*@HEAD*/
+<title>La basilica di Santa Maria del Fiore</title>
+<style>.card { width: min(470px, 52%); } .card-body { font-size: 1.04em; }</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>Santa Maria del Fiore · <em>la basilica</em></h1>
+    <span class="sp"></span>
+      <button class="tbtn" id="bVoice" aria-pressed="false" title="Legge ogni capitolo appena ci arrivi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg><span class="lbl">Voce automatica</span></button>
+/*@BUTTONS*/
+    <a class="tbtn" href="cupola-cantiere.html"><span class="lbl">Il cantiere</span> →</a>
+    <a class="tbtn" href="cupola-basilica-en.html" lang="en">English</a>
+  </header>
+/*@SHELL*/
+  <footer class="bar">
+    <button class="big ghost" id="prev" aria-label="Capitolo precedente" title="Backspace (Home: inizio)">◀</button>
+    <div class="chap-title" id="chapTitle"></div>
+    <div class="chap-dots" id="dots"></div>
+    <button class="big" id="next" aria-label="Capitolo successivo" title="Invio (Fine: ultimo capitolo)">▶</button>
+  </footer>
+</div>
+<script>/*@THREE*/</script>
+<script>/*@IMG*/</script>
+<script>/*@MODEL*/</script>
+<script>/*@FRESCO*/</script>
+<script>/*@ENGINE*/</script>
+<script>/*@SECTION*/</script>
+<script>/*@DATA*/</script>
+<script>/*@AUDIO*/</script>
+<script>/*@UI*/</script>
+<script>
+(function () {
+  // Seconda parte della guida: tutta la basilica, capitolo per capitolo, sullo stesso modello 3D (com'è oggi).
+  const { BASILICA, CAM } = CUPOLA_DATA, { $, mount, applyStage, fillCard, tweenYear, stopTween, setupCommon } = UI;
+  const { v3, v2 } = mount();
+  const { fs } = setupCommon(v3);
+  const CH = [{ kind: 'cover', title: 'Inizio' }, ...BASILICA.map(c => ({ kind: 'chap', c, title: c.title }))];
+  let cur = -1, year = 1471;
+  const dots = $('#dots');
+  CH.forEach((c, i) => { const b = document.createElement('button'); b.title = c.title; b.setAttribute('aria-label', `Capitolo ${i + 1}: ${c.title}`); b.onclick = () => go(i); dots.appendChild(b); });
+  function setYear(y) {
+    year = y; v3 && v3.setYear(y); v2.setYear(y);
+    $('#yearBig').textContent = 'oggi'; $('#hBig').textContent = 'la cattedrale com\'è adesso';
+    UI.badgeToday(v3);
+  }
+  function go(i) {
+    i = Math.max(0, Math.min(CH.length - 1, i)); if (i === cur) return;
+    cur = i; stopTween();
+    const c = CH[i];
+    [...dots.children].forEach((d, k) => { d.classList.toggle('on', k === i); d.classList.toggle('done', k < i); });
+    $('#chapTitle').textContent = c.title;
+    $('#prev').disabled = i === 0; $('#next').disabled = i === CH.length - 1;
+    if (c.kind === 'cover') {
+      applyStage({ cam: { ...CAM.city, dist: 320, theta: Math.PI + 0.6 }, section: false, labels: [], l2: [], v2: 'whole', focus: null }, v3, v2);
+      fillCard(`<span class="kicker">Firenze, dal 1296 a oggi</span><h2>Una cattedrale per una città intera</h2>`,
+        `<p class="lead">Nella prima parte hai visto come nasce la cupola. Ora facciamo il giro di tutta la cattedrale: la facciata, le porte, il campanile, il Battistero e ciò che c'è dentro.</p>
+         <p>Usa ◀ ▶ in basso, oppure Invio e Backspace. Le frecce e Pag su/giù muovono la vista 3D; il modello si può ruotare e attraversare.</p>`);
+      $('#card').classList.add('cover');
+      return;
+    }
+    $('#card').classList.remove('cover');
+    const q = c.c, k = i - 1;
+    applyStage({ cam: q.cam, section: !!q.section, interior: !!q.interior, labels: q.labels || [], l2: [], v2: q.v2 || 'whole', focus: null, scaffold2d: !!q.scaffold2d }, v3, v2);
+    const au = (window.CUPOLA_AUDIO || {})[q.id] ? `<button class="listen" data-audio="${q.id}" title="Tasto A">▶ Ascolta</button>` : '';
+    fillCard(`<span class="card-date">${q.date}</span>${au}<span class="card-step">${k + 1} di ${BASILICA.length}</span><h2>${q.title}</h2>`,
+      q.text.map((p, j) => `<p${j ? '' : ' class="lead"'}>${p}</p>`).join('') + (q.fact ? `<div class="fact"><strong>Lo sapevi?</strong>${q.fact}</div>` : ''));
+    if (voiceOn) UI.narrate(q.id);
+  }
+  const bVoice = $('#bVoice');
+  let voiceOn = sessionStorage.getItem('cupolaVoce') === '1';
+  UI.syncToggle('#bVoice', voiceOn);
+  bVoice.onclick = () => { voiceOn = !voiceOn; sessionStorage.setItem('cupolaVoce', voiceOn ? '1' : '0'); UI.syncToggle('#bVoice', voiceOn); if (voiceOn) UI.listen(); else UI.stopAudio(); };
+  $('#prev').onclick = () => go(cur - 1);
+  $('#next').onclick = () => go(cur + 1);
+  addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('dialog') && e.key !== 'Escape') return;
+    const k = e.key;
+    if (UI.moveKeys(e, v3)) return;
+    if (k === 'Enter' && e.target.matches && e.target.matches('button:focus-visible,a:focus-visible')) return;
+    if (k === 'Enter' || k === ' ') { e.preventDefault(); go(cur + 1); }
+    else if (k === 'Backspace') { e.preventDefault(); go(cur - 1); }
+    else if (k === 'Home') { e.preventDefault(); go(0); }
+    else if (k === 'End') { e.preventDefault(); go(CH.length - 1); }
+    else if (k === 's' || k === 'S') $('#bSect').click();
+    else if (k === 'f' || k === 'F') fs();
+    else if (k === 'g' || k === 'G') $('#bGloss').click();
+    else if (k === 'i' || k === 'I') $('#bInt').click();
+    else if (k === 'a' || k === 'A') UI.listen();
+    else if (k === '+') $('#zIn').click(); else if (k === '-') $('#zOut').click();
+  });
+  UI.refresh = labels => { setYear(year); const c = CH[cur]; if (labels && c && c.kind === 'chap') v3 && v3.setLabels(c.c.labels || []); };
+  if (v3) v3.flyTo({ ...CAM.city, dist: 320, theta: Math.PI + 0.6 }, true);
+  setYear(1471); go(+new URLSearchParams(location.search).get('cap') || 0);
+})();
+</script>
+</body>
+</html>

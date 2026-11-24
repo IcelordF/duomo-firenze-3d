@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="it">
+<head>
+/*@HEAD*/
+<title>Il racconto della cupola di Brunelleschi</title>
+<style>.card { width: min(470px, 52%); } .card-body { font-size: 1.04em; }</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>La cupola di <em>Brunelleschi</em> · il racconto</h1>
+    <span class="sp"></span>
+      <button class="tbtn" id="bVoice" aria-pressed="false" title="Legge ogni capitolo appena ci arrivi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg><span class="lbl">Voce automatica</span></button>
+/*@BUTTONS*/
+    <a class="tbtn" href="cupola-cantiere.html"><span class="lbl">Il cantiere</span> →</a>
+    <a class="tbtn" href="cupola-basilica.html"><span class="lbl">La basilica</span> →</a>
+    <a class="tbtn" href="cupola-racconto-en.html" lang="en">English</a>
+  </header>
+/*@SHELL*/
+  <footer class="bar">
+    <button class="big ghost" id="prev" aria-label="Capitolo precedente" title="Backspace (Home: inizio)">◀</button>
+    <div class="chap-title" id="chapTitle"></div>
+    <div class="chap-dots" id="dots"></div>
+    <button class="big" id="next" aria-label="Capitolo successivo" title="Invio (Fine: ultimo capitolo)">▶</button>
+  </footer>
+</div>
+<script>/*@THREE*/</script>
+<script>/*@IMG*/</script>
+<script>/*@MODEL*/</script>
+<script>/*@FRESCO*/</script>
+<script>/*@ENGINE*/</script>
+<script>/*@SECTION*/</script>
+<script>/*@DATA*/</script>
+<script>/*@AUDIO*/</script>
+<script>/*@UI*/</script>
+<script>
+(function () {
+  const { STAGES, NUMBERS, QUIZ, CAM, CURIOSITA, AFFRESCHI } = CUPOLA_DATA, { $, mount, applyStage, cardHTML, fillCard, tweenYear, stopTween, setupCommon } = UI;
+  const { v3, v2 } = mount();
+  const { fs } = setupCommon(v3);
+  const CH = [
+    { kind: 'cover', title: 'Inizio' },
+    ...STAGES.map(st => ({ kind: 'stage', st, title: st.title })),
+    ...CURIOSITA.map(c => ({ kind: 'curio', c, title: 'Curiosità: ' + c.title })),
+    ...AFFRESCHI.map(c => ({ kind: 'affr', c, title: 'Gli affreschi: ' + c.title })),
+    { kind: 'nums', title: 'In numeri' },
+    { kind: 'quiz', title: 'Quiz' }
+  ];
+  let cur = -1, year = 1418, seen = new Set();
+  const dots = $('#dots');
+  CH.forEach((c, i) => { const b = document.createElement('button'); if (c.kind === 'curio' || c.kind === 'affr') b.className = c.kind; b.title = c.title; b.setAttribute('aria-label', `Capitolo ${i + 1}: ${c.title}`); b.onclick = () => go(i); dots.appendChild(b); });
+
+  function setYear(y) {
+    year = y; v3 && v3.setYear(y); v2.setYear(y);
+    $('#yearBig').textContent = Math.floor(y);
+    const h = Cupola.heightAt(y);
+    $('#hBig').textContent = y < 1420.6 ? 'il progetto' : h < Cupola.geom.YTOP ? `muratura a ${(h - Cupola.geom.GROUND).toFixed(0)} m da terra` : y < 1446 ? 'cupola chiusa' : y < 1471 ? 'la lanterna' : 'cantiere finito';
+    UI.badgeToday(v3);
+  }
+  const finalStage = { ...STAGES[STAGES.length - 1], cam: CAM.city, labels: [], l2: [], v2: 'whole', focus: null, section: false };
+
+  function go(i) {
+    i = Math.max(0, Math.min(CH.length - 1, i)); if (i === cur) return;
+    cur = i; seen.add(i); stopTween();
+    const c = CH[i];
+    [...dots.children].forEach((d, k) => { d.classList.toggle('on', k === i); d.classList.toggle('done', seen.has(k) && k !== i); });
+    $('#chapTitle').textContent = c.title;
+    $('#prev').disabled = i === 0; $('#next').disabled = i === CH.length - 1;
+    if (c.kind === 'cover') {
+      applyStage({ ...STAGES[0], labels: [], cam: { ...CAM.city, dist: 300 } }, v3, v2);
+      tweenYear(year, 1418, 1200, setYear);
+      fillCard(`<span class="kicker">Firenze, 1418 – 1471</span><h2>Come si costruisce una cupola impossibile</h2>`,
+        `<p class="lead">Sopra la cattedrale di Firenze c'è un buco largo circa 45 metri, a più di 50 metri da terra. Nessuno sa come coprirlo.</p>
+         <p>Segui il cantiere di <b>Filippo Brunelleschi</b> capitolo dopo capitolo. A sinistra c'è il modello 3D, che puoi ruotare; a destra lo <b>spaccato</b>, come in un disegno di progetto, che puoi trascinare e ingrandire.</p>
+         <p>Usa i pulsanti ◀ ▶ in basso oppure Invio e Backspace. Le frecce e Pag su/giù muovono la vista 3D. Alla fine c'è un quiz.</p>`);
+      $('#card').classList.add('cover');
+      return;
+    }
+    $('#card').classList.remove('cover');
+    if (c.kind === 'curio' || c.kind === 'affr') {
+      const af = c.kind === 'affr', list = af ? AFFRESCHI : CURIOSITA, k = list.indexOf(c.c), q = c.c;
+      applyStage({ cam: q.cam, section: af || q.cam === CAM.sect, interior: af, labels: [], l2: [], v2: q.v2 || 'whole', focus: null, scaffold2d: q.scaffold2d }, v3, v2);
+      tweenYear(year, af ? 1471 : q.year, 1600, setYear);
+      const au = (window.CUPOLA_AUDIO || {})[q.id] ? `<button class="listen" data-audio="${q.id}" title="Tasto A">▶ Ascolta</button>` : '';
+      fillCard(`<span class="card-date ${c.kind}">${af ? 'Gli affreschi' : 'Curiosità'} · ${q.date}</span>${au}<span class="card-step">${k + 1} di ${list.length}</span><h2>${q.title}</h2>`,
+        q.text.map((p, j) => `<p${j ? '' : ' class="lead"'}>${p}</p>`).join(''));
+      autoVoice(q.id);
+      return;
+    }
+    if (c.kind === 'stage') {
+      const k = i - 1, card = cardHTML(c.st, k, STAGES.length, true);
+      fillCard(card.head, card.body); applyStage(c.st, v3, v2); autoVoice(c.st.id);
+      tweenYear(year, c.st.year, Math.min(4000, Math.max(1400, Math.abs(c.st.year - year) * 300)), setYear);
+    } else if (c.kind === 'nums') {
+      applyStage(finalStage, v3, v2); tweenYear(year, 1471, 1500, setYear);
+      fillCard('<span class="card-date">1418 – 1471</span><h2>La cupola in numeri</h2>',
+        `<div class="nums">${NUMBERS.map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join('')}</div>
+         <p style="margin-top:14px">Le misure sono arrotondate: le fonti (Museo Galileo, Opera del Duomo) danno valori leggermente diversi.</p>`);
+    } else quiz();
+  }
+
+  // voce automatica: legge ogni capitolo appena ci arrivi (scelta ricordata nella sessione)
+  const bVoice = $('#bVoice');
+  let voiceOn = sessionStorage.getItem('cupolaVoce') === '1';
+  UI.syncToggle('#bVoice', voiceOn);
+  bVoice.onclick = () => { voiceOn = !voiceOn; sessionStorage.setItem('cupolaVoce', voiceOn ? '1' : '0'); UI.syncToggle('#bVoice', voiceOn); if (voiceOn) UI.listen(); else UI.stopAudio(); };
+  function autoVoice(id) { if (voiceOn) UI.narrate(id); }
+
+  let qi = 0, score = 0;
+  function quiz(restart) {
+    if (restart) { qi = 0; score = 0; }
+    applyStage(finalStage, v3, v2); if (year < 1471) tweenYear(year, 1471, 1500, setYear);
+    if (qi >= QUIZ.length) {
+      fillCard('<span class="card-date">Quiz</span><h2>Risultato</h2>',
+        `<p class="quiz-q">Hai risposto bene a ${score} domande su ${QUIZ.length}.</p><p>${score === QUIZ.length ? 'Perfetto: Brunelleschi ti assumerebbe in cantiere!' : score >= 4 ? 'Ottimo lavoro!' : 'Ripassa i capitoli e riprova.'}</p>
+         <button class="quiz-next" id="qAgain">Ricomincia il quiz</button>`);
+      $('#qAgain').onclick = () => quiz(true);
+      return;
+    }
+    const Q = QUIZ[qi];
+    fillCard(`<span class="card-date">Quiz</span><span class="card-step">domanda ${qi + 1} di ${QUIZ.length}</span><h2>Mettiti alla prova</h2>`,
+      `<p class="quiz-q">${Q.q}</p>${Q.a.map((a, k) => `<button class="quiz-a" data-k="${k}">${'ABC'[k]}. ${a}</button>`).join('')}<div id="qMore"></div>`);
+    document.querySelectorAll('.quiz-a').forEach(b => b.onclick = () => {
+      if ($('#qMore').innerHTML) return;
+      const k = +b.dataset.k; if (k === Q.ok) score++;
+      b.classList.add(k === Q.ok ? 'ok' : 'ko'); document.querySelector(`.quiz-a[data-k="${Q.ok}"]`).classList.add('ok');
+      $('#qMore').innerHTML = `<p><b>${k === Q.ok ? 'Giusto!' : 'Non proprio.'}</b></p><button class="quiz-next" id="qNext">${qi + 1 < QUIZ.length ? 'Prossima domanda' : 'Vedi il risultato'}</button>`;
+      $('#qNext').onclick = () => { qi++; quiz(); };
+    });
+  }
+
+  $('#prev').onclick = () => go(cur - 1);
+  $('#next').onclick = () => go(cur + 1);
+  addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('dialog') && e.key !== 'Escape') return;
+    const k = e.key;
+    if (UI.moveKeys(e, v3)) return;
+    if (k === 'Enter' && e.target.matches && e.target.matches('button:focus-visible,a:focus-visible')) return;
+    if (k === 'Enter' || k === ' ') { e.preventDefault(); go(cur + 1); }
+    else if (k === 'Backspace') { e.preventDefault(); go(cur - 1); }
+    else if (k === 'Home') { e.preventDefault(); go(0); }
+    else if (k === 'End') { e.preventDefault(); go(CH.length - 1); }
+    else if (k === 's' || k === 'S') $('#bSect').click();
+    else if (k === 'f' || k === 'F') fs();
+    else if (k === 'i' || k === 'I') $('#bInt').click();
+    else if (k === 'g' || k === 'G') $('#bGloss').click();
+    else if (k === 'a' || k === 'A') UI.listen();
+    else if (k === '+') $('#zIn').click(); else if (k === '-') $('#zOut').click();
+  });
+  UI.refresh = labels => { setYear(year); const c = CH[cur]; if (labels && c && c.kind === 'stage') applyStage(c.st, v3, v2, { cam: false }); };
+  if (v3) v3.flyTo({ ...CAM.city, dist: 300 }, true);
+  setYear(1418); go(+new URLSearchParams(location.search).get('cap') || 0);
+})();
+</script>
+</body>
+</html>

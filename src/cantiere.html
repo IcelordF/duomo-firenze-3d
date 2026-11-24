@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="it">
+<head>
+/*@HEAD*/
+<title>Il cantiere della cupola di Brunelleschi</title>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>La cupola di <em>Brunelleschi</em> · il cantiere</h1>
+    <span class="sp"></span>
+/*@BUTTONS*/
+    <a class="tbtn" href="cupola-racconto.html"><span class="lbl">Il racconto</span> →</a>
+    <a class="tbtn" href="cupola-basilica.html"><span class="lbl">La basilica</span> →</a>
+    <a class="tbtn" href="cupola-cantiere-en.html" lang="en">English</a>
+  </header>
+/*@SHELL*/
+  <footer class="bar">
+    <button class="big ghost" id="prev" aria-label="Tappa precedente" title="Backspace (Home: inizio)">◀</button>
+    <button class="big" id="play" aria-label="Visita guidata con voce: avvia o ferma" title="Visita guidata con voce (barra spaziatrice)">▶</button>
+    <button class="big ghost" id="next" aria-label="Tappa successiva" title="Invio (Fine: ultima tappa)">▶</button>
+    <div class="yearbox" id="yearBox">1418</div>
+    <div class="timeline">
+      <div class="marks" id="marks"></div>
+      <input type="range" id="yr" min="1418" max="1471" step="0.05" value="1418" aria-label="Anno del cantiere">
+    </div>
+  </footer>
+</div>
+<script>/*@THREE*/</script>
+<script>/*@IMG*/</script>
+<script>/*@MODEL*/</script>
+<script>/*@FRESCO*/</script>
+<script>/*@ENGINE*/</script>
+<script>/*@SECTION*/</script>
+<script>/*@DATA*/</script>
+<script>/*@AUDIO*/</script>
+<script>/*@UI*/</script>
+<script>
+(function () {
+  const { STAGES } = CUPOLA_DATA, { $, mount, applyStage, cardHTML, fillCard, tweenYear, stopTween, setupCommon, syncToggle } = UI;
+  const Y0 = 1418, Y1 = 1471;
+  const { v3, v2 } = mount();
+  const { fs } = setupCommon(v3);
+  const yr = $('#yr'), marks = $('#marks');
+  let year = Y0, cur = -1, locked = -1, playing = 0;
+
+  STAGES.forEach((st, i) => {
+    const b = document.createElement('button'); b.className = 'mark'; b.textContent = i + 1;
+    b.title = `${st.date} · ${st.title}`; b.setAttribute('aria-label', b.title);
+    b.style.left = (st.year - Y0) / (Y1 - Y0) * 100 + '%'; b.onclick = () => go(i); marks.appendChild(b);
+  });
+  const stageAt = y => { let k = 0; STAGES.forEach((s, i) => { if (s.year <= y + 0.001) k = i; }); return k; };
+
+  function status(y) {
+    const h = Cupola.heightAt(y);
+    if (y < 1420.6) return 'progetto e concorso';
+    if (h < Cupola.geom.YTOP) return `muratura a ${(h - Cupola.geom.GROUND).toFixed(0)} m da terra`;
+    if (y < 1446) return 'cupola chiusa';
+    if (y < 1471) return 'si costruisce la lanterna';
+    return 'cantiere finito';
+  }
+  function setYear(y, fromSlider) {
+    year = y; v3 && v3.setYear(y); v2.setYear(y);
+    yr.value = y; yr.style.setProperty('--p', (y - Y0) / (Y1 - Y0) * 100 + '%');
+    $('#yearBox').textContent = $('#yearBig').textContent = Math.floor(y);
+    $('#hBig').textContent = status(y); UI.badgeToday(v3);
+    const i = locked >= 0 ? locked : stageAt(y);
+    if (i !== cur) show(i, !fromSlider);
+  }
+  function show(i, cam) {
+    cur = i; const st = STAGES[i], c = cardHTML(st, i, STAGES.length, false);
+    fillCard(c.head, c.body); applyStage(st, v3, v2, { cam });
+    [...marks.children].forEach((m, k) => m.classList.toggle('on', k === i));
+  }
+  async function go(i, dur) {
+    i = Math.max(0, Math.min(STAGES.length - 1, i));
+    locked = i; show(i, true);
+    const ok = await tweenYear(year, STAGES[i].year, dur || 1500, y => setYear(y));
+    if (ok) locked = -1;
+    return ok;
+  }
+  function stop() { playing = 0; $('#play').textContent = '▶'; UI.stopAudio(); }
+  async function play() {
+    const token = playing = Date.now(); $('#play').textContent = '❚❚';
+    const start = year >= Y1 - 0.01 ? 0 : Math.abs(year - STAGES[cur].year) < 0.05 ? cur : cur + 1;   // se sei all'inizio di una tappa, la racconta
+    for (let i = start; i < STAGES.length; i++) {
+      if (playing !== token) return;
+      // la cupola cresce mentre la voce racconta la tappa; si va avanti quando la voce ha finito
+      const [ok, said] = await Promise.all([
+        go(i, i === 0 ? 1200 : Math.min(5000, Math.max(1800, (STAGES[i].year - year) * 350))),
+        UI.narrate(STAGES[i].id)
+      ]);
+      if (!ok || said === false || playing !== token) { if (playing === token) stop(); return; }
+      await new Promise(r => setTimeout(r, said ? 1200 : 7000));
+    }
+    stop();
+  }
+  yr.addEventListener('input', () => { if (v3 && v3.interior) UI.setInterior(false, { fly: false }); stop(); stopTween(); locked = -1; setYear(+yr.value, true); });
+  yr.addEventListener('change', () => yr.blur());   // dopo lo slider le frecce tornano a muovere la vista 3D
+  $('#prev').onclick = () => { stop(); go(year > STAGES[cur].year + 0.05 ? cur : cur - 1); };
+  $('#next').onclick = () => { stop(); go(cur + 1); };
+  $('#play').onclick = () => playing ? stop() : play();
+  addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('input,dialog')) { if (e.key !== 'Escape') return; }
+    const k = e.key;
+    if (UI.moveKeys(e, v3)) return;
+    if (k === 'Enter' && e.target.matches && e.target.matches('button:focus-visible,a:focus-visible')) return;   // Invio su un pulsante scelto da tastiera: lo preme e basta
+    if (k === 'Enter') { e.preventDefault(); $('#next').click(); }
+    else if (k === 'Backspace') { e.preventDefault(); $('#prev').click(); }
+    else if (k === 'Home') { e.preventDefault(); stop(); go(0); }
+    else if (k === 'End') { e.preventDefault(); stop(); go(STAGES.length - 1); }
+    else if (k === ' ') { e.preventDefault(); $('#play').click(); }
+    else if (k === 's' || k === 'S') $('#bSect').click();
+    else if (k === 'f' || k === 'F') fs();
+    else if (k === 'i' || k === 'I') $('#bInt').click();
+    else if (k === 'g' || k === 'G') $('#bGloss').click();
+    else if (k === 'a' || k === 'A') UI.listen();
+    else if (k === '+') $('#zIn').click(); else if (k === '-') $('#zOut').click();
+  });
+  UI.refresh = labels => { setYear(year); if (labels && cur >= 0) applyStage(STAGES[cur], v3, v2, { cam: false }); };
+  if (v3) v3.flyTo(STAGES[0].cam, true);
+  setYear(Y0);
+  const qs = +new URLSearchParams(location.search).get('tappa'); if (qs) go(qs - 1, 10);
+})();
+</script>
+</body>
+</html>

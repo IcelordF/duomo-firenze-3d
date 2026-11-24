@@ -1,0 +1,22 @@
+  <main class="stage">
+    <section class="view3d" id="v3" aria-label="Modello 3D della cupola">
+      <div class="badge"><b id="yearBig">1418</b><span id="hBig"></span></div>
+      <div class="hint">Trascina: ruota · frecce e Pag su/giù: muoviti · Q/E: girati · rotella: avvicina · doppio clic: vai lì</div>
+    </section>
+    <section class="view2d" id="v2" aria-label="Spaccato della cupola">
+      <div class="sec-tools">
+        <button class="sbtn" id="zIn" aria-label="Ingrandisci lo spaccato">+</button>
+        <button class="sbtn" id="zOut" aria-label="Rimpicciolisci lo spaccato">−</button>
+      </div>
+      <article class="card" id="card" aria-live="polite">
+        <button class="close" id="cardHide" aria-label="Nascondi la scheda">✕</button>
+        <div class="card-head" id="cardHead"></div>
+        <div class="card-body" id="cardBody"></div>
+      </article>
+      <button class="tbtn card-toggle" id="cardShow" style="background:#2b2018">Mostra la scheda</button>
+    </section>
+  </main>
+  <dialog class="gloss" id="gloss">
+    <header><h3>Glossario</h3><button class="sbtn" id="glossClose" aria-label="Chiudi">✕</button></header>
+    <dl id="glossList"></dl>
+  </dialog>

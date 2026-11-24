@@ -1,0 +1,10 @@
+# segreti: restano solo su questo PC
+.env*
+# modelli 3D Warehouse: la General Model License vieta di ridistribuirli da soli (sono comunque inclusi nelle pagine in dist/)
+vendor/model/*.glb
+# cartelle di lavoro locali
+.claude/
+.playwright-mcp/
+.remember/
+node_modules/
+__pycache__/
