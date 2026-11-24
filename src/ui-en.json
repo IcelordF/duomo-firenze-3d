@@ -1,6 +1,6 @@
-[  ["title=\"Tasto P: vista in prima persona. Trascina per guardare, frecce per camminare, Esc per uscire\"", "title=\"Key P: first-person view. Drag to look around, arrows to walk, Esc to leave\""],
+[  ["title=\"Cammina (tasto P): vista in prima persona. Trascina per guardare, frecce per camminare, Esc per uscire\"", "title=\"Walk (key P): first-person view. Drag to look around, arrows to walk, Esc to leave\""],
   ["<span class=\"lbl\">Cammina</span>", "<span class=\"lbl\">Walk</span>"],
-  ["title=\"Tasto C: nasconde le case intorno alla piazza\"", "title=\"Key C: hides the houses around the square\""],
+  ["title=\"Senza case (tasto C): nasconde le case intorno alla piazza\"", "title=\"No houses (key C): hides the houses around the square\""],
   ["<span class=\"lbl\">Senza case</span>", "<span class=\"lbl\">No houses</span>"],
   ["'Cammina: trascina per guardarti intorno · frecce per camminare e girarti · Q/E per girarti · doppio clic per andare in un punto · Pag su/giù per salire in volo (senza muri)'", "'Walk: drag to look around · arrows to walk and turn · Q/E to turn · double-click to go to a spot · Page Up/Down to fly up (no walls)'"],
   ["<li>Modelli 3D di cattedrale, campanile e Battistero: Enrico Dalbosco (Arrigo Silva), 3D Warehouse (", "<li>3D models of the cathedral, bell tower and Baptistery: Enrico Dalbosco (Arrigo Silva), 3D Warehouse ("],
@@ -110,5 +110,7 @@
   ["Girati a sinistra", "Turn left"],
   ["Girati a destra", "Turn right"],
   ["Codice sorgente su GitHub (open source)", "Source code on GitHub (open source)"],
-  ["Codice sorgente su GitHub", "Source code on GitHub"]
+  ["Codice sorgente su GitHub", "Source code on GitHub"],
+  ["aria-label=\"Cammina\"", "aria-label=\"Walk\""],
+  ["aria-label=\"Senza case\"", "aria-label=\"No houses\""]
 ]

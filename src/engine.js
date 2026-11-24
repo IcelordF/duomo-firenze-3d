@@ -718,18 +718,62 @@
         }
         g.fillStyle = '#b39878'; g.fillRect(0, 0, w, 10); g.fillRect(0, h - 8, w, 8);
       }), roughness: 0.8 }, WORLD);
-      // pavimento: riquadri bianchi e grigi con cerchi e rombi rossi, una campata per riquadro
-      const flT = canvasTex(1024, 1024, (g, w) => {
-        g.fillStyle = '#e9e4da'; g.fillRect(0, 0, w, w);
-        for (let i = 0; i < 600; i++) { g.fillStyle = `rgba(90,90,90,${Math.random() * 0.05})`; g.fillRect(Math.random() * w, Math.random() * w, 6, 2); }
-        g.strokeStyle = '#6a6a66'; g.lineWidth = 10; g.strokeRect(5, 5, w - 10, w - 10);
-        g.fillStyle = '#8f3b2e'; for (let k = 0; k < 16; k++) { const t = 60 + k * 57; for (const [x, y] of [[t, 40], [t, w - 40], [40, t], [w - 40, t]]) { g.save(); g.translate(x, y); g.rotate(PI / 4); g.fillRect(-9, -9, 18, 18); g.restore(); } }
-        const c = w / 2;
-        for (const [r, col, lw] of [[400, '#5a5a56', 16], [350, '#8f3b2e', 10], [300, '#5a5a56', 16], [230, '#3f3f3c', 10], [160, '#8f3b2e', 8]]) { g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.arc(c, c, r, 0, 7); g.stroke(); }
-        g.fillStyle = '#3f3f3c'; for (let k = 0; k < 8; k++) { g.save(); g.translate(c, c); g.rotate(k * PI / 4); g.beginPath(); g.ellipse(0, -95, 30, 55, 0, 0, 7); g.fill(); g.restore(); }
-        g.fillStyle = '#8f3b2e'; g.beginPath(); g.arc(c, c, 34, 0, 7); g.fill();
-      }, { repeat: true });
-      flT.repeat.set(8, 4);
+      // pavimento di Baccio d'Agnolo e Francesco da Sangallo (1526-1660), disegnato in metri su un'unica texture (circa 46 px/m):
+      // campate ovest = «labirinto» di tessere brune su fondo beige con raggi rossi verso un ottagono (prima foto, l'OPA all'ingresso);
+      // campate verso la cupola = riquadri chiari con grandi rosoni (seconda foto); navatelle = quadroni bianchi a cornice grigia
+      const FS = 46, flT = canvasTex(Math.ceil(L * FS), Math.ceil(2 * ZA * FS), g => {
+        g.scale(FS, FS); const MZ = ZA;                                   // y = z + ZA: la linea mediana della navata è y = ZA
+        const R0 = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+        R0(0, 0, L, 2 * ZA, '#e4ded2');
+        for (let i = 0; i < 9000; i++) { g.fillStyle = `rgba(120,100,80,${Math.random() * 0.06})`; g.fillRect(Math.random() * L, Math.random() * 2 * ZA, 0.6, 0.08); }   // venature
+        // navatelle: quadroni di 2,2 m, cornice grigio-azzurra e rombo interno
+        for (const [y0, y1] of [[0, MZ - ZN], [MZ + ZN, 2 * ZA]]) for (let x = 0; x < L; x += 2.2) for (let y = y0; y < y1; y += 2.2) {
+          g.strokeStyle = '#6e7176'; g.lineWidth = 0.12; g.strokeRect(x + 0.1, y + 0.1, 2.0, 2.0);
+          g.fillStyle = '#9a9ca0'; g.beginPath(); g.moveTo(x + 1.1, y + 0.45); g.lineTo(x + 1.75, y + 1.1); g.lineTo(x + 1.1, y + 1.75); g.lineTo(x + 0.45, y + 1.1); g.closePath(); g.fill();
+          g.fillStyle = '#e4ded2'; g.beginPath(); g.ellipse(x + 1.1, y + 1.1, 0.32, 0.2, 0, 0, 7); g.fill();
+        }
+        const y0 = MZ - ZN, h = 2 * ZN;
+        for (let k = 0; k < 4; k++) {
+          const x0 = k * B, cx = x0 + B / 2, cy = MZ;
+          g.save(); g.beginPath(); g.rect(x0, y0, B, h); g.clip();
+          if (k < 2) {                                                    // labirinto: otto spicchi con tessere parallele al bordo esterno
+            R0(x0, y0, B, h, '#d6c3a0');
+            const P = [[x0, y0], [cx, y0], [x0 + B, y0], [x0 + B, cy], [x0 + B, y0 + h], [cx, y0 + h], [x0, y0 + h], [x0, cy]];
+            for (let q = 0; q < 8; q++) {
+              const [ax, ay] = P[q], [bx, by] = P[(q + 1) % 8], ex = bx - ax, ey = by - ay, el = Math.hypot(ex, ey), nx = -ey / el, ny = ex / el;
+              g.save(); g.beginPath(); g.moveTo(cx, cy); g.lineTo(ax, ay); g.lineTo(bx, by); g.closePath(); g.clip();
+              const dist = Math.abs((cx - ax) * nx + (cy - ay) * ny), sg = Math.sign((cx - ax) * nx + (cy - ay) * ny);
+              for (let d = 0.2, r = 0; d < dist; d += 0.34, r++) {           // file di tessere sfalsate, come mattoni
+                g.setLineDash([0.55, 0.22]); g.lineDashOffset = (r % 2) * 0.38; g.lineWidth = 0.13;
+                g.strokeStyle = r % 3 === 0 ? '#7a4f32' : r % 3 === 1 ? '#a9845c' : '#8f6a48';
+                g.beginPath(); g.moveTo(ax + nx * d * sg - ex, ay + ny * d * sg - ey); g.lineTo(bx + nx * d * sg + ex, by + ny * d * sg + ey); g.stroke();
+              }
+              g.restore();
+            }
+            g.setLineDash([]);
+            for (const [px, py] of P) {                                    // raggi rossi bordati di scuro verso l'ottagono
+              g.strokeStyle = '#4e3626'; g.lineWidth = 0.34; g.beginPath(); g.moveTo(cx, cy); g.lineTo(px, py); g.stroke();
+              g.strokeStyle = '#a5523a'; g.lineWidth = 0.2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(px, py); g.stroke();
+            }
+            const oct = (r, fill, stroke, lw) => { g.beginPath(); for (let a = 0; a < 8; a++) { const t = PI / 8 + a * PI / 4; g[a ? 'lineTo' : 'moveTo'](cx + r * Math.cos(t), cy + r * Math.sin(t)); } g.closePath(); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); } };
+            oct(2.4, '#d6c3a0', '#4e3626', 0.25); oct(2.0, '#b4613f', '#7a3a26', 0.12); oct(1.55, null, '#e2c9a6', 0.08);
+            if (k === 0) {                                                 // il monogramma dell'Opera del Duomo, leggibile entrando
+              g.save(); g.translate(cx, cy); g.rotate(PI / 2); g.fillStyle = '#5a2c1c'; g.font = '600 1.1px Cormorant, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('OPA', 0, 0.05); g.restore();
+            } else { g.fillStyle = '#e2c9a6'; for (let a = 0; a < 8; a++) { g.save(); g.translate(cx, cy); g.rotate(a * PI / 4); g.beginPath(); g.ellipse(0, -0.75, 0.22, 0.55, 0, 0, 7); g.fill(); g.restore(); } }
+          } else {                                                        // rosoni: cerchi concentrici bianchi, neri e rossi su riquadri chiari
+            R0(x0, y0, B, h, '#ebe7df');
+            g.strokeStyle = '#5c5e62'; g.lineWidth = 0.14; for (let x = x0; x < x0 + B; x += B / 6) for (let y = y0; y < y0 + h; y += h / 5) g.strokeRect(x + 0.15, y + 0.15, B / 6 - 0.3, h / 5 - 0.3);
+            for (const [r, c, lw] of [[8.4, '#3c3c3a', 0.5], [7.6, '#a5523a', 0.25], [6.9, '#3c3c3a', 0.5], [5.2, '#8e9094', 0.3], [3.4, '#a5523a', 0.22]]) { g.strokeStyle = c; g.lineWidth = lw; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.stroke(); }
+            g.fillStyle = '#ebe7df'; g.beginPath(); g.arc(cx, cy, 6.6, 0, 7); g.fill();
+            for (let a = 0; a < 16; a++) { g.save(); g.translate(cx, cy); g.rotate(a * PI / 8); g.fillStyle = a % 2 ? '#a5523a' : '#3c3c3a'; g.beginPath(); g.moveTo(0, -1.2); g.quadraticCurveTo(0.7, -3.6, 0, -6.2); g.quadraticCurveTo(-0.7, -3.6, 0, -1.2); g.fill(); g.restore(); }
+            g.fillStyle = '#a5523a'; g.beginPath(); g.arc(cx, cy, 1.0, 0, 7); g.fill(); g.fillStyle = '#3c3c3a'; g.beginPath(); g.arc(cx, cy, 0.5, 0, 7); g.fill();
+          }
+          g.restore();
+          g.setLineDash([]); g.strokeStyle = '#5a4433'; g.lineWidth = 0.5; g.strokeRect(x0 + 0.25, y0 + 0.25, B - 0.5, h - 0.5);   // fascia tra le campate
+          g.strokeStyle = '#a5523a'; g.lineWidth = 0.15; g.strokeRect(x0 + 0.7, y0 + 0.7, B - 1.4, h - 1.4);
+        }
+        for (const y of [y0, y0 + h]) { R0(0, y - 0.6, L, 1.2, '#8a8c90'); for (let x = 0.3; x < L; x += 0.9) R0(x, y - 0.3, 0.45, 0.6, '#e4ded2'); }   // fascia a scacchi sotto le arcate
+      }, { repeat: false });
       const fl = add(new T.PlaneGeometry(L, 2 * ZA), mat({ map: flT, roughness: 0.6 }, WORLD), naveIn, false); fl.rotation.x = -PI / 2; fl.position.set(CX, GROUND + 0.32, 0); fl.receiveShadow = true;
       // pareti esterne delle navatelle (nord e sud) e controfacciata; vetrate a lancetta, una per campata
       for (const sg of [-1, 1]) add(new T.BoxGeometry(L, 26.5, 0.9), plasterW, naveIn).position.set(CX, GROUND + 13.25, sg * ZA);

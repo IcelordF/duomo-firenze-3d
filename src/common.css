@@ -187,7 +187,8 @@ main.stage.no3d .view3d { display: none; }
 .card-date.curio { background: var(--verde); }
 .chap-dots button.curio { border-color: #8fb39c; }
 .tbtn { white-space: nowrap; }
-@media (max-width: 1800px) { #bLight .lbl, #bFull .lbl, #bGloss .lbl { display: none; } .tbtn { padding: 6px 12px; } }
+#bLight .lbl, #bFull .lbl, #bGloss .lbl { display: none; }   /* pulsanti secondari: solo icona (nome nel tooltip) */
+@media (max-width: 1800px) { .tbtn { padding: 6px 12px; } }
 @media (max-width: 1700px) { #bSect .lbl, #bVoice .lbl, #bInt .lbl { display: none; } header.top h1 { font-size: 1.35em; } }
 @media (max-width: 1250px) { .tbtn { padding: 6px 9px; } header.top h1 { font-size: 1.15em; } }
 /* comandi della camera 3D (LIM e touch) */
@@ -212,4 +213,11 @@ ul.cred { margin: 6px 0 0; padding-left: 18px; font-size: .9em; } ul.cred a { co
 /* l'intestazione non deve mai allargare la pagina (la barra orizzontale copriva la linea delle fasi) */
 .app { grid-template-columns: minmax(0, 1fr); }
 header.top { min-width: 0; overflow-x: auto; scrollbar-width: none; }
-@media (max-width: 1550px) { #bWalk .lbl, #bCity .lbl { display: none; } }
+#bWalk .lbl, #bCity .lbl { display: none; }   /* solo icona: il nome è nel tooltip e in aria-label */
+/* intestazione elastica: il titolo cede spazio (con i puntini), pulsanti e lingua restano sempre interi */
+header.top h1 { min-width: 0; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; }
+header.top .tbtn { flex-shrink: 0; }
+@media (max-width: 1450px) { #bVoice .lbl { display: none; } }
+.gitlink { flex-shrink: 0; margin-left: 6px; width: 30px; height: 30px; display: grid; place-items: center; color: #cdbfa6; opacity: .75; border-radius: 50%; }
+.gitlink:hover, .gitlink:focus-visible { opacity: 1; color: #fff; outline: none; }
+.gitlink svg { width: 20px; height: 20px; }
