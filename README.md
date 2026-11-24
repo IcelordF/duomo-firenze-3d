@@ -1,14 +1,13 @@
 # La cupola di Brunelleschi · il Duomo di Firenze in 3D
 
-**Provalo online: [icelordf.github.io/duomo-firenze-3d](https://icelordf.github.io/duomo-firenze-3d/)**
+**Provalo online: [icelordf.github.io/duomo-firenze-3d](https://icelordf.github.io/duomo-firenze-3d/)** · [English](https://icelordf.github.io/duomo-firenze-3d/en/)
 
-Tre percorsi interattivi su Santa Maria del Fiore, pensati per la seconda media. Si ruota il modello, lo si taglia per
+Due percorsi interattivi su Santa Maria del Fiore, pensati per la seconda media. Si ruota il modello, lo si taglia per
 guardare dentro la doppia calotta, si cammina nella navata. Ogni capitolo ha una voce narrante in italiano o in inglese.
 
 | Percorso | Italiano | English |
 | --- | --- | --- |
-| **Il cantiere**: la cupola cresce anno per anno, dal 1418 al 1471 | [apri](https://icelordf.github.io/duomo-firenze-3d/dist/cupola-cantiere.html) | [open](https://icelordf.github.io/duomo-firenze-3d/dist/cupola-cantiere-en.html) |
-| **Il racconto**: la sfida di Brunelleschi, curiosità e quiz | [apri](https://icelordf.github.io/duomo-firenze-3d/dist/cupola-racconto.html) | [open](https://icelordf.github.io/duomo-firenze-3d/dist/cupola-racconto-en.html) |
+| **Il cantiere**: la cupola cresce anno per anno dal 1418 al 1471, poi curiosità, affreschi e quiz | [apri](https://icelordf.github.io/duomo-firenze-3d/dist/cupola-cantiere.html) | [open](https://icelordf.github.io/duomo-firenze-3d/dist/cupola-cantiere-en.html) |
 | **La basilica**: facciata, porte, Campanile, Battistero, interno | [apri](https://icelordf.github.io/duomo-firenze-3d/dist/cupola-basilica.html) | [open](https://icelordf.github.io/duomo-firenze-3d/dist/cupola-basilica-en.html) |
 
 ![La cupola finita con la palla del Verrocchio](docs/screenshots/cantiere-palla.jpg)
@@ -17,11 +16,12 @@ guardare dentro la doppia calotta, si cammina nella navata. Ogni capitolo ha una
 | --- | --- |
 | ![Il cantiere nel 1430: la spina di pesce](docs/screenshots/cantiere-spina.jpg) | ![Piazza del Duomo e la città quattrocentesca](docs/screenshots/basilica-copertina.jpg) |
 | ![La navata vista camminando](docs/screenshots/basilica-navata.jpg) | ![Il coro ottagonale sotto la cupola](docs/screenshots/basilica-coro.jpg) |
-| ![La Porta del Paradiso del Battistero](docs/screenshots/basilica-paradiso.jpg) | ![La versione inglese del racconto](docs/screenshots/racconto-en.jpg) |
+| ![La Porta del Paradiso del Battistero](docs/screenshots/basilica-paradiso.jpg) | ![La versione inglese](docs/screenshots/racconto-en.jpg) |
 
 ## Cosa c'è dentro
 
-- **Il cantiere passo per passo.** Una linea del tempo porta la cupola dal tamburo vuoto del 1418 alla palla dorata del 1471. Si vedono le due calotte, gli speroni, i mattoni a spina di pesce, le catene di pietra e di legno, il bue-argano e la gru della lanterna.
+- **Il cantiere passo per passo.** Una linea del tempo porta la cupola dal tamburo vuoto del 1418 alla palla dorata del 1471. Si vedono le due calotte, gli speroni, i mattoni a spina di pesce, le catene di pietra e di legno, il bue-argano e la gru della lanterna. Il tasto ▶ fa partire la visita guidata con la voce.
+- **Curiosità, affreschi e quiz.** Dopo le dieci tappe la stessa pagina racconta l'arresto di Brunelleschi, la beffa del Grasso, lo sciopero, il Badalone e altre storie del cantiere, poi il Giudizio universale nella cupola, la cupola in numeri e un quiz finale.
 - **Lo spaccato 2D.** Accanto al 3D c'è una sezione disegnata che segue lo stesso anno. C'è anche la tavola dei ponteggi interni, ricostruita sul disegno attribuito a Giovan Battista Nelli.
 - **La piazza nel Quattrocento.** Duomo, Campanile e Battistero sono circondati da una città ricostruita sulla *Pianta della Catena* (c. 1470): case intonacate o in pietraforte, case-torri, sporti, tetti a padiglione, la Loggia del Bigallo. Con il tasto **C** le case spariscono.
 - **L'interno da percorrere.** Entrando dal portale centrale si accende l'interno di oggi:
@@ -38,12 +38,12 @@ guardare dentro la doppia calotta, si cammina nella navata. Ogni capitolo ha una
 | Frecce · Pag su/giù · Q/E | muoviti · sali e scendi · girati |
 | **P** | «Cammina»: prima persona ad altezza d'occhio, con i muri (Esc per uscire) |
 | **S** · **I** · **C** | taglia il modello · interno di oggi · nascondi le case |
-| Invio / Backspace · Home / Fine | tappa o capitolo successivo / precedente · inizio / fine |
+| Invio / Backspace · Home / Fine · spazio | tappa o capitolo successivo / precedente · inizio / fine · visita guidata |
 | **A** · **G** · **F** | ascolta · glossario · schermo intero |
 
 ## Com'è fatto
 
-- **Nessun framework e nessun server.** Ogni pagina è un unico file HTML (circa 25 MB) che contiene librerie, font, immagini, modelli e audio. Si apre anche da chiavetta, senza rete. `build.mjs` (Node, senza dipendenze) assembla i sorgenti di `src/` nelle 6 pagine di `dist/`.
+- **Nessun framework e nessun server.** Ogni pagina è un unico file HTML (circa 25 MB) che contiene librerie, font, immagini, modelli e audio. Si apre anche da chiavetta, senza rete. `build.mjs` (Node, senza dipendenze) assembla i sorgenti di `src/` nelle 4 pagine di `dist/` (cantiere e basilica, in italiano e in inglese).
 - **Il motore 3D** è [three.js](https://threejs.org/) r170, caricato come script classico, con `GLTFLoader` per i modelli.
   - **La cupola** è generata in codice, anno per anno: profilo a quinto acuto, otto vele, calotta interna ed esterna, speroni e catene. Un piano di taglio apre la sezione.
   - **Duomo, Campanile e Battistero** vengono dai modelli glb, alleggeriti con `scripts/slim-glb.py`. Al caricamento le mesh vengono fuse per materiale.
@@ -60,7 +60,8 @@ guardare dentro la doppia calotta, si cammina nella navata. Ogni capitolo ha una
 src/        motore 3D (engine.js), spaccato 2D (section2d.js), contenuti (data.js, i18n-en.js), interfaccia, pagine
 scripts/    slim-glb.py (alleggerisce i glb), tts.mjs (genera la voce)
 vendor/     three.js, GLTFLoader, font, foto (img/ + credits.json), audio, originali scaricati (dl-*)
-dist/       le 6 pagine pronte
+dist/       le pagine pronte (cupola-racconto*.html rimanda al cantiere, dove il racconto è confluito)
+en/         la home in inglese
 docs/       screenshot
 verifica/   confronti tra il modello e le foto reali
 ```

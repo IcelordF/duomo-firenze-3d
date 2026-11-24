@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brunelleschi's dome and Florence Cathedral in 3D</title>
+<meta name="description" content="Two interactive 3D tours of Santa Maria del Fiore for middle-school students: the building of Brunelleschi's dome with its story, and a visit to the basilica. Free and open source.">
+<meta name="keywords" content="Brunelleschi's dome, Florence Cathedral, Santa Maria del Fiore, Brunelleschi, 3D model, Giotto's Bell Tower, Baptistery, art history, middle school">
+<meta name="author" content="IcelordF">
+<meta name="theme-color" content="#1d1813">
+<link rel="canonical" href="https://icelordf.github.io/duomo-firenze-3d/en/">
+<link rel="alternate" hreflang="it" href="https://icelordf.github.io/duomo-firenze-3d/">
+<link rel="alternate" hreflang="en" href="https://icelordf.github.io/duomo-firenze-3d/en/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Brunelleschi's dome">
+<meta property="og:title" content="Brunelleschi's dome and Florence Cathedral in 3D">
+<meta property="og:description" content="Two interactive 3D tours of Florence Cathedral: the building of the dome with its story, and a visit to the basilica.">
+<meta property="og:url" content="https://icelordf.github.io/duomo-firenze-3d/en/">
+<meta property="og:image" content="https://icelordf.github.io/duomo-firenze-3d/docs/screenshots/basilica-copertina.jpg">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Brunelleschi's dome","url":"https://icelordf.github.io/duomo-firenze-3d/en/","inLanguage":"en","description":"Two interactive 3D tours of Florence Cathedral for middle-school students.","about":{"@type":"LandmarksOrHistoricalBuildings","name":"Cattedrale di Santa Maria del Fiore","sameAs":"https://it.wikipedia.org/wiki/Cattedrale_di_Santa_Maria_del_Fiore"},"creator":{"@type":"Person","name":"IcelordF","url":"https://github.com/IcelordF"}}</script>
+<style>
+@font-face { font-family: Cormorant; font-weight: 600; font-display: swap; src: url(../vendor/cormorant-garamond-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: Cormorant; font-weight: 600; font-style: italic; font-display: swap; src: url(../vendor/cormorant-garamond-latin-600-italic.woff2) format('woff2'); }
+@font-face { font-family: Lexend; font-weight: 400; font-display: swap; src: url(../vendor/lexend-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: Lexend; font-weight: 700; font-display: swap; src: url(../vendor/lexend-latin-700-normal.woff2) format('woff2'); }
+:root { --ink: #1d1813; --paper: #f4ecdc; --cotto: #b4532f; --line: #d8c8aa; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.55 Lexend, sans-serif; }
+header { background: var(--ink); color: #f3ead8; padding: 56px 24px 64px; }
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1 { font: 600 clamp(2.2em, 5vw, 3.6em)/1.05 Cormorant, serif; margin: 0 0 14px; }
+h1 em { color: #e0a070; }
+header p { max-width: 640px; margin: 0; opacity: .9; }
+header .lang { float: right; color: #e0a070; border: 1px solid rgba(224,160,112,.5); border-radius: 999px; padding: 6px 16px; text-decoration: none; }
+header .lang:hover { background: rgba(224,160,112,.15); }
+main { padding: 0 24px 48px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 22px; margin-top: -36px; }
+.card { background: #fffaf0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(29,24,19,.12); }
+.card img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-bottom: 1px solid var(--line); }
+.card div { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+.card h2 { font: 600 1.6em/1.1 Cormorant, serif; margin: 0 0 6px; }
+.card p { margin: 0 0 16px; flex: 1; font-size: .95em; }
+.card a.go { align-self: flex-start; background: var(--cotto); color: #fff; text-decoration: none; font-weight: 700; padding: 10px 20px; border-radius: 999px; }
+.note { margin-top: 36px; font-size: .9em; color: #5a4c3c; }
+.note a { color: var(--cotto); }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="lang" href="../" hreflang="it" lang="it">Italiano</a>
+  <h1><em>Brunelleschi</em>'s dome<br>and Florence Cathedral in 3D</h1>
+  <p>Two interactive tours of Santa Maria del Fiore, made for middle-school students: rotate the model, cut it open to look inside, walk down the nave. Every chapter has a narrator.</p>
+</div></header>
+<main><div class="wrap">
+  <div class="cards">
+    <article class="card"><img src="../docs/screenshots/racconto-en.jpg" alt="The English version of the building site, in the 3D model" width="1600" height="900">
+      <div><h2>The building site</h2><p>The dome rises year by year, from 1418 to 1471: the competition, the machines, the herringbone brickwork, the chains. Then stories from the site, the frescoes and a final quiz.</p>
+      <span><a class="go" href="../dist/cupola-cantiere-en.html">Open</a></span></div></article>
+    <article class="card"><img src="../docs/screenshots/basilica-navata.jpg" alt="The nave of the cathedral seen on foot in the 3D model" width="1600" height="900">
+      <div><h2>The basilica</h2><p>Eleven chapters: the facade, the Gates of Paradise, the Bell Tower, the Baptistery and an interior you can walk through.</p>
+      <span><a class="go" href="../dist/cupola-basilica-en.html">Open</a></span></div></article>
+  </div>
+  <p class="note">Needs a browser with WebGL. Each page is a single file that also works offline (about 25 MB each). Open-source educational project: <a href="https://github.com/IcelordF/duomo-firenze-3d">code and credits on GitHub</a>. 3D models by Enrico Dalbosco (3D Warehouse); photos from Wikimedia Commons.</p>
+</div></main>
+</body>
+</html>

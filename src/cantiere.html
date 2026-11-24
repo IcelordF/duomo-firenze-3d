@@ -10,7 +10,6 @@
     <h1>La cupola di <em>Brunelleschi</em> · il cantiere</h1>
     <span class="sp"></span>
 /*@BUTTONS*/
-    <a class="tbtn" href="cupola-racconto.html"><span class="lbl">Il racconto</span> →</a>
     <a class="tbtn" href="cupola-basilica.html"><span class="lbl">La basilica</span> →</a>
     <a class="tbtn" href="cupola-cantiere-en.html" lang="en">English</a>
   </header>
@@ -24,6 +23,7 @@
       <div class="marks" id="marks"></div>
       <input type="range" id="yr" min="1418" max="1471" step="0.05" value="1418" aria-label="Anno del cantiere">
     </div>
+    <div class="chap-dots extra" id="dots" aria-label="Curiosità, affreschi e quiz"></div>
   </footer>
 </div>
 <script>/*@THREE*/</script>
@@ -37,67 +37,130 @@
 <script>/*@UI*/</script>
 <script>
 (function () {
-  const { STAGES } = CUPOLA_DATA, { $, mount, applyStage, cardHTML, fillCard, tweenYear, stopTween, setupCommon, syncToggle } = UI;
-  const Y0 = 1418, Y1 = 1471;
+  // Una sola pagina: le 10 tappe del cantiere sulla linea del tempo, poi curiosità, affreschi, numeri e quiz.
+  const { STAGES, NUMBERS, QUIZ, CAM, CURIOSITA, AFFRESCHI } = CUPOLA_DATA, { $, mount, applyStage, cardHTML, fillCard, tweenYear, stopTween, setupCommon } = UI;
   const { v3, v2 } = mount();
   const { fs } = setupCommon(v3);
-  const yr = $('#yr'), marks = $('#marks');
-  let year = Y0, cur = -1, locked = -1, playing = 0;
+  const Y0 = 1418, Y1 = 1471;
+  const CH = [
+    { kind: 'cover', title: 'Inizio' },
+    ...STAGES.map(st => ({ kind: 'stage', st, title: st.title })),
+    ...CURIOSITA.map(c => ({ kind: 'curio', c, title: 'Curiosità: ' + c.title })),
+    ...AFFRESCHI.map(c => ({ kind: 'affr', c, title: 'Gli affreschi: ' + c.title })),
+    { kind: 'nums', title: 'In numeri' },
+    { kind: 'quiz', title: 'Quiz' }
+  ];
+  const S1 = 1, NUMS = CH.length - 2;              // prima tappa, capitolo «In numeri»
+  const yr = $('#yr'), marks = $('#marks'), dots = $('#dots');
+  let year = Y0, cur = -1, playing = 0, seen = new Set();
 
   STAGES.forEach((st, i) => {
     const b = document.createElement('button'); b.className = 'mark'; b.textContent = i + 1;
     b.title = `${st.date} · ${st.title}`; b.setAttribute('aria-label', b.title);
-    b.style.left = (st.year - Y0) / (Y1 - Y0) * 100 + '%'; b.onclick = () => go(i); marks.appendChild(b);
+    b.style.left = (st.year - Y0) / (Y1 - Y0) * 100 + '%'; b.onclick = () => { stop(); go(S1 + i); }; marks.appendChild(b);
   });
+  CH.forEach((c, i) => { if (c.kind === 'cover' || c.kind === 'stage') return; const b = document.createElement('button'); b.dataset.i = i; if (c.kind === 'curio' || c.kind === 'affr') b.className = c.kind; b.title = c.title; b.setAttribute('aria-label', `Capitolo ${i + 1}: ${c.title}`); b.onclick = () => { stop(); go(i); }; dots.appendChild(b); });
   const stageAt = y => { let k = 0; STAGES.forEach((s, i) => { if (s.year <= y + 0.001) k = i; }); return k; };
 
-  function status(y) {
-    const h = Cupola.heightAt(y);
-    if (y < 1420.6) return 'progetto e concorso';
-    if (h < Cupola.geom.YTOP) return `muratura a ${(h - Cupola.geom.GROUND).toFixed(0)} m da terra`;
-    if (y < 1446) return 'cupola chiusa';
-    if (y < 1471) return 'si costruisce la lanterna';
-    return 'cantiere finito';
-  }
-  function setYear(y, fromSlider) {
+  function setYear(y) {
     year = y; v3 && v3.setYear(y); v2.setYear(y);
     yr.value = y; yr.style.setProperty('--p', (y - Y0) / (Y1 - Y0) * 100 + '%');
     $('#yearBox').textContent = $('#yearBig').textContent = Math.floor(y);
-    $('#hBig').textContent = status(y); UI.badgeToday(v3);
-    const i = locked >= 0 ? locked : stageAt(y);
-    if (i !== cur) show(i, !fromSlider);
+    const h = Cupola.heightAt(y);
+    $('#hBig').textContent = y < 1420.6 ? 'il progetto' : h < Cupola.geom.YTOP ? `muratura a ${(h - Cupola.geom.GROUND).toFixed(0)} m da terra` : y < 1446 ? 'cupola chiusa' : y < 1471 ? 'la lanterna' : 'cantiere finito';
+    UI.badgeToday(v3);
   }
-  function show(i, cam) {
-    cur = i; const st = STAGES[i], c = cardHTML(st, i, STAGES.length, false);
-    fillCard(c.head, c.body); applyStage(st, v3, v2, { cam });
-    [...marks.children].forEach((m, k) => m.classList.toggle('on', k === i));
+  const finalStage = { ...STAGES[STAGES.length - 1], cam: CAM.city, labels: [], l2: [], v2: 'whole', focus: null, section: false };
+
+  // mostra il capitolo i; restituisce la promessa dell'animazione dell'anno (false se interrotta)
+  function go(i, opt = {}) {
+    i = Math.max(0, Math.min(CH.length - 1, i));
+    const c = CH[i], again = i === cur;
+    if (again && c.kind !== 'stage') return Promise.resolve(true);
+    cur = i; seen.add(i); stopTween();
+    [...marks.children].forEach((m, k) => m.classList.toggle('on', c.kind === 'stage' && k === i - S1));
+    [...dots.children].forEach(d => { const k = +d.dataset.i; d.classList.toggle('on', k === i); d.classList.toggle('done', seen.has(k) && k !== i); });
+    $('#prev').disabled = i === 0; $('#next').disabled = i === CH.length - 1;
+    $('#card').classList.toggle('cover', c.kind === 'cover');
+    if (c.kind === 'cover') {
+      applyStage({ ...STAGES[0], labels: [], cam: { ...CAM.city, dist: 300 } }, v3, v2);
+      fillCard(`<span class="kicker">Firenze, 1418 – 1471</span><h2>Come si costruisce una cupola impossibile</h2>`,
+        `<p class="lead">Sopra la cattedrale di Firenze c'è un buco largo circa 45 metri, a più di 50 metri da terra. Nessuno sa come coprirlo.</p>
+         <p>Segui il cantiere di <b>Filippo Brunelleschi</b> tappa dopo tappa. A sinistra c'è il modello 3D, che puoi ruotare; a destra lo <b>spaccato</b>, come in un disegno di progetto, che puoi trascinare e ingrandire.</p>
+         <p>Trascina la <b>linea del tempo</b> in basso per far crescere la cupola anno per anno, oppure premi ▶ per la visita guidata con la voce. Dopo le dieci tappe ci sono le curiosità, gli affreschi e un quiz.</p>`);
+      return tweenYear(year, Y0, 1200, setYear);
+    }
+    if (c.kind === 'stage') {
+      const card = cardHTML(c.st, i - S1, STAGES.length, false);
+      fillCard(card.head, card.body); applyStage(c.st, v3, v2, { cam: opt.cam !== false });
+      if (opt.slider) return Promise.resolve(true);
+      return tweenYear(year, c.st.year, opt.dur || Math.min(4000, Math.max(1400, Math.abs(c.st.year - year) * 300)), setYear);
+    }
+    if (c.kind === 'curio' || c.kind === 'affr') {
+      const af = c.kind === 'affr', list = af ? AFFRESCHI : CURIOSITA, k = list.indexOf(c.c), q = c.c;
+      applyStage({ cam: q.cam, section: af || q.cam === CAM.sect, interior: af, labels: [], l2: [], v2: q.v2 || 'whole', focus: null, scaffold2d: q.scaffold2d }, v3, v2);
+      const au = (window.CUPOLA_AUDIO || {})[q.id] ? `<button class="listen" data-audio="${q.id}" title="Tasto A">▶ Ascolta</button>` : '';
+      fillCard(`<span class="card-date ${c.kind}">${af ? 'Gli affreschi' : 'Curiosità'} · ${q.date}</span>${au}<span class="card-step">${k + 1} di ${list.length}</span><h2>${q.title}</h2>`,
+        q.text.map((p, j) => `<p${j ? '' : ' class="lead"'}>${p}</p>`).join(''));
+      return tweenYear(year, af ? 1471 : q.year, 1600, setYear);
+    }
+    if (c.kind === 'nums') {
+      applyStage(finalStage, v3, v2);
+      fillCard('<span class="card-date">1418 – 1471</span><h2>La cupola in numeri</h2>',
+        `<div class="nums">${NUMBERS.map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join('')}</div>
+         <p style="margin-top:14px">Le misure sono arrotondate: le fonti (Museo Galileo, Opera del Duomo) danno valori leggermente diversi.</p>`);
+      return tweenYear(year, 1471, 1500, setYear);
+    }
+    quiz(true); return Promise.resolve(true);
   }
-  async function go(i, dur) {
-    i = Math.max(0, Math.min(STAGES.length - 1, i));
-    locked = i; show(i, true);
-    const ok = await tweenYear(year, STAGES[i].year, dur || 1500, y => setYear(y));
-    if (ok) locked = -1;
-    return ok;
-  }
+  const idOf = c => c.kind === 'stage' ? c.st.id : c.c && c.c.id;
+
+  // visita guidata: la voce racconta tappe, curiosità e affreschi; si va avanti quando ha finito
   function stop() { playing = 0; $('#play').textContent = '▶'; UI.stopAudio(); }
   async function play() {
     const token = playing = Date.now(); $('#play').textContent = '❚❚';
-    const start = year >= Y1 - 0.01 ? 0 : Math.abs(year - STAGES[cur].year) < 0.05 ? cur : cur + 1;   // se sei all'inizio di una tappa, la racconta
-    for (let i = start; i < STAGES.length; i++) {
+    const c = CH[cur];
+    let start = cur <= 0 ? S1 : c.kind === 'stage' && year > c.st.year + 0.05 ? cur + 1 : cur;
+    if (start >= NUMS) start = S1;
+    for (let i = start; i < NUMS; i++) {
       if (playing !== token) return;
-      // la cupola cresce mentre la voce racconta la tappa; si va avanti quando la voce ha finito
-      const [ok, said] = await Promise.all([
-        go(i, i === 0 ? 1200 : Math.min(5000, Math.max(1800, (STAGES[i].year - year) * 350))),
-        UI.narrate(STAGES[i].id)
-      ]);
+      const [ok, said] = await Promise.all([go(i, { dur: i === S1 ? 1200 : undefined }), UI.narrate(idOf(CH[i]))]);
       if (!ok || said === false || playing !== token) { if (playing === token) stop(); return; }
       await new Promise(r => setTimeout(r, said ? 1200 : 7000));
     }
-    stop();
+    if (playing === token) { go(NUMS); stop(); }
   }
-  yr.addEventListener('input', () => { if (v3 && v3.interior) UI.setInterior(false, { fly: false }); stop(); stopTween(); locked = -1; setYear(+yr.value, true); });
+
+  let qi = 0, score = 0;
+  function quiz(restart) {
+    if (restart) { qi = 0; score = 0; }
+    applyStage(finalStage, v3, v2); if (year < 1471) tweenYear(year, 1471, 1500, setYear);
+    if (qi >= QUIZ.length) {
+      fillCard('<span class="card-date">Quiz</span><h2>Risultato</h2>',
+        `<p class="quiz-q">Hai risposto bene a ${score} domande su ${QUIZ.length}.</p><p>${score === QUIZ.length ? 'Perfetto: Brunelleschi ti assumerebbe in cantiere!' : score >= 4 ? 'Ottimo lavoro!' : 'Ripassa i capitoli e riprova.'}</p>
+         <button class="quiz-next" id="qAgain">Ricomincia il quiz</button>`);
+      $('#qAgain').onclick = () => quiz(true);
+      return;
+    }
+    const Q = QUIZ[qi];
+    fillCard(`<span class="card-date">Quiz</span><span class="card-step">domanda ${qi + 1} di ${QUIZ.length}</span><h2>Mettiti alla prova</h2>`,
+      `<p class="quiz-q">${Q.q}</p>${Q.a.map((a, k) => `<button class="quiz-a" data-k="${k}">${'ABC'[k]}. ${a}</button>`).join('')}<div id="qMore"></div>`);
+    document.querySelectorAll('.quiz-a').forEach(b => b.onclick = () => {
+      if ($('#qMore').innerHTML) return;
+      const k = +b.dataset.k; if (k === Q.ok) score++;
+      b.classList.add(k === Q.ok ? 'ok' : 'ko'); document.querySelector(`.quiz-a[data-k="${Q.ok}"]`).classList.add('ok');
+      $('#qMore').innerHTML = `<p><b>${k === Q.ok ? 'Giusto!' : 'Non proprio.'}</b></p><button class="quiz-next" id="qNext">${qi + 1 < QUIZ.length ? 'Prossima domanda' : 'Vedi il risultato'}</button>`;
+      $('#qNext').onclick = () => { qi++; quiz(); };
+    });
+  }
+
+  yr.addEventListener('input', () => {
+    if (v3 && v3.interior) UI.setInterior(false, { fly: false });
+    stop(); stopTween(); setYear(+yr.value);
+    const i = S1 + stageAt(year); if (i !== cur) go(i, { slider: true, cam: false });
+  });
   yr.addEventListener('change', () => yr.blur());   // dopo lo slider le frecce tornano a muovere la vista 3D
-  $('#prev').onclick = () => { stop(); go(year > STAGES[cur].year + 0.05 ? cur : cur - 1); };
+  $('#prev').onclick = () => { stop(); const c = CH[cur]; go(c.kind === 'stage' && year > c.st.year + 0.05 ? cur : cur - 1); };
   $('#next').onclick = () => { stop(); go(cur + 1); };
   $('#play').onclick = () => playing ? stop() : play();
   addEventListener('keydown', e => {
@@ -108,7 +171,7 @@
     if (k === 'Enter') { e.preventDefault(); $('#next').click(); }
     else if (k === 'Backspace') { e.preventDefault(); $('#prev').click(); }
     else if (k === 'Home') { e.preventDefault(); stop(); go(0); }
-    else if (k === 'End') { e.preventDefault(); stop(); go(STAGES.length - 1); }
+    else if (k === 'End') { e.preventDefault(); stop(); go(CH.length - 1); }
     else if (k === ' ') { e.preventDefault(); $('#play').click(); }
     else if (k === 's' || k === 'S') $('#bSect').click();
     else if (k === 'f' || k === 'F') fs();
@@ -117,10 +180,11 @@
     else if (k === 'a' || k === 'A') UI.listen();
     else if (k === '+') $('#zIn').click(); else if (k === '-') $('#zOut').click();
   });
-  UI.refresh = labels => { setYear(year); if (labels && cur >= 0) applyStage(STAGES[cur], v3, v2, { cam: false }); };
-  if (v3) v3.flyTo(STAGES[0].cam, true);
-  setYear(Y0);
-  const qs = +new URLSearchParams(location.search).get('tappa'); if (qs) go(qs - 1, 10);
+  UI.refresh = labels => { setYear(year); const c = CH[cur]; if (labels && c && c.kind === 'stage') applyStage(c.st, v3, v2, { cam: false }); };
+  if (v3) v3.flyTo({ ...CAM.city, dist: 300 }, true);
+  // ?tappa=N (vecchio link del cantiere) oppure ?cap=N (vecchio link del racconto)
+  const qs = new URLSearchParams(location.search), tp = +qs.get('tappa');
+  setYear(Y0); go(tp ? S1 + tp - 1 : +qs.get('cap') || 0);
 })();
 </script>
 </body>

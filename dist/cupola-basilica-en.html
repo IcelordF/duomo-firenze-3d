@@ -229,6 +229,9 @@ header.top .tbtn { flex-shrink: 0; }
 .gitlink { flex-shrink: 0; margin-left: 6px; width: 30px; height: 30px; display: grid; place-items: center; color: #cdbfa6; opacity: .75; border-radius: 50%; }
 .gitlink:hover, .gitlink:focus-visible { opacity: 1; color: #fff; outline: none; }
 .gitlink svg { width: 20px; height: 20px; }
+/* pagina unica: dopo la linea del tempo, i pallini di curiosità, affreschi, numeri e quiz */
+.chap-dots.extra { flex: 0 1 auto; max-width: 28%; gap: 6px; }
+.chap-dots.extra button { width: 16px; height: 16px; min-width: 16px; }
 </style>
 
 <title>Florence Cathedral in 3D: a guided tour of the basilica</title>
@@ -257,7 +260,7 @@ header.top .tbtn { flex-shrink: 0; }
   <header class="top">
     <h1>Santa Maria del Fiore · <em>the basilica</em></h1>
     <span class="sp"></span>
-      <button class="tbtn" id="bVoice" aria-pressed="false" title="Reads each chapter aloud as you reach it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg><span class="lbl">Auto voice</span></button>
+      <button class="tbtn" id="bVoice" aria-pressed="false" title="Legge ogni capitolo appena ci arrivi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg><span class="lbl">Voce automatica</span></button>
       <button class="tbtn" id="bSect" aria-pressed="false" title="Key S"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20 Q4 6 12 4 Q20 6 20 20Z"/><path d="M12 4v16"/></svg><span class="lbl">Cut the 3D</span></button>
       <button class="tbtn" id="bInt" aria-pressed="false" title="Key I: the interior as it is today, with the frescoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V11a7 7 0 0 1 14 0v10"/><circle cx="12" cy="11" r="2.5"/></svg><span class="lbl">Interior today</span></button>
       <button class="tbtn" id="bWalk" aria-pressed="false" aria-label="Walk" title="Walk (key P): first-person view. Drag to look around, arrows to walk, Esc to leave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13" cy="4" r="2"/><path d="M9 21l2-6 3 3v3M8 11l3-3 3 2 3 1M11 8l-1 7"/></svg><span class="lbl">Walk</span></button>
