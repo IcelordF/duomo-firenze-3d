@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La cupola di Brunelleschi e il Duomo di Firenze in 3D</title>
+<meta name="description" content="Tre percorsi interattivi in 3D su Santa Maria del Fiore per la scuola media: il cantiere della cupola di Brunelleschi, la sua storia e la visita alla basilica. Gratuito e open source.">
+<meta name="keywords" content="cupola del Brunelleschi, Duomo di Firenze, Santa Maria del Fiore, Brunelleschi, modello 3D, Campanile di Giotto, Battistero, storia dell'arte, scuola media">
+<meta name="author" content="IcelordF">
+<meta name="theme-color" content="#1d1813">
+<link rel="canonical" href="https://icelordf.github.io/duomo-firenze-3d/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="La cupola di Brunelleschi">
+<meta property="og:title" content="La cupola di Brunelleschi e il Duomo di Firenze in 3D">
+<meta property="og:description" content="Tre percorsi interattivi in 3D su Santa Maria del Fiore: il cantiere della cupola, la sua storia e la visita alla basilica.">
+<meta property="og:url" content="https://icelordf.github.io/duomo-firenze-3d/">
+<meta property="og:image" content="https://icelordf.github.io/duomo-firenze-3d/docs/screenshots/basilica-copertina.jpg">
+<meta property="og:locale" content="it_IT">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"La cupola di Brunelleschi","url":"https://icelordf.github.io/duomo-firenze-3d/","inLanguage":["it","en"],"description":"Tre percorsi interattivi in 3D su Santa Maria del Fiore per la scuola media.","about":{"@type":"LandmarksOrHistoricalBuildings","name":"Cattedrale di Santa Maria del Fiore","sameAs":"https://it.wikipedia.org/wiki/Cattedrale_di_Santa_Maria_del_Fiore"},"creator":{"@type":"Person","name":"IcelordF","url":"https://github.com/IcelordF"}}</script>
+<style>
+@font-face { font-family: Cormorant; font-weight: 600; font-display: swap; src: url(vendor/cormorant-garamond-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: Cormorant; font-weight: 600; font-style: italic; font-display: swap; src: url(vendor/cormorant-garamond-latin-600-italic.woff2) format('woff2'); }
+@font-face { font-family: Lexend; font-weight: 400; font-display: swap; src: url(vendor/lexend-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: Lexend; font-weight: 700; font-display: swap; src: url(vendor/lexend-latin-700-normal.woff2) format('woff2'); }
+:root { --ink: #1d1813; --paper: #f4ecdc; --cotto: #b4532f; --line: #d8c8aa; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.55 Lexend, sans-serif; }
+header { background: var(--ink); color: #f3ead8; padding: 56px 24px 64px; }
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1 { font: 600 clamp(2.2em, 5vw, 3.6em)/1.05 Cormorant, serif; margin: 0 0 14px; }
+h1 em { color: #e0a070; }
+header p { max-width: 640px; margin: 0; opacity: .9; }
+header .lang { float: right; color: #e0a070; }
+main { padding: 0 24px 48px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; margin-top: -36px; }
+.card { background: #fffaf0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(29,24,19,.12); }
+.card img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-bottom: 1px solid var(--line); }
+.card div { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+.card h2 { font: 600 1.6em/1.1 Cormorant, serif; margin: 0 0 6px; }
+.card p { margin: 0 0 16px; flex: 1; font-size: .95em; }
+.card a.go { align-self: flex-start; background: var(--cotto); color: #fff; text-decoration: none; font-weight: 700; padding: 10px 20px; border-radius: 999px; }
+.card a.en { margin-left: 12px; color: var(--cotto); font-size: .9em; }
+.note { margin-top: 36px; font-size: .9em; color: #5a4c3c; }
+.note a { color: var(--cotto); }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="lang" href="#en" lang="en">English below</a>
+  <h1>La cupola di <em>Brunelleschi</em><br>e il Duomo di Firenze in 3D</h1>
+  <p>Tre percorsi interattivi su Santa Maria del Fiore, pensati per la seconda media: si ruota il modello, si taglia per guardare dentro, si cammina nella navata. Ogni capitolo ha una voce narrante.</p>
+</div></header>
+<main><div class="wrap">
+  <div class="cards">
+    <article class="card"><img src="docs/screenshots/cantiere-palla.jpg" alt="La cupola finita con la palla del Verrocchio, nel modello 3D" width="1600" height="900">
+      <div><h2>Il cantiere</h2><p>La cupola cresce anno per anno, dal 1418 al 1471: macchine, mattoni a spina di pesce, catene e ponteggi interni.</p>
+      <span><a class="go" href="dist/cupola-cantiere.html">Apri</a><a class="en" href="dist/cupola-cantiere-en.html" lang="en">English</a></span></div></article>
+    <article class="card"><img src="docs/screenshots/cantiere-spina.jpg" alt="Il cantiere della cupola nel 1430, con lo spaccato della muratura" width="1600" height="900">
+      <div><h2>Il racconto</h2><p>La sfida di Filippo Brunelleschi: il concorso, la doppia cupola, le curiosità del cantiere e un quiz finale.</p>
+      <span><a class="go" href="dist/cupola-racconto.html">Apri</a><a class="en" href="dist/cupola-racconto-en.html" lang="en">English</a></span></div></article>
+    <article class="card"><img src="docs/screenshots/basilica-navata.jpg" alt="La navata centrale del Duomo vista a piedi nel modello 3D" width="1600" height="900">
+      <div><h2>La basilica</h2><p>Undici capitoli: facciata, Porta del Paradiso, Campanile, Battistero e l'interno da percorrere a piedi.</p>
+      <span><a class="go" href="dist/cupola-basilica.html">Apri</a><a class="en" href="dist/cupola-basilica-en.html" lang="en">English</a></span></div></article>
+  </div>
+  <p class="note" id="en" lang="en"><strong>English.</strong> Three interactive 3D tours of Florence Cathedral for middle-school students: <a href="dist/cupola-cantiere-en.html">the building site</a>, <a href="dist/cupola-racconto-en.html">the story of the dome</a> and <a href="dist/cupola-basilica-en.html">the basilica</a>.</p>
+  <p class="note">Serve un browser con WebGL. Le pagine sono file unici e funzionano anche offline (circa 25 MB l'una). Progetto didattico open source: <a href="https://github.com/IcelordF/duomo-firenze-3d">codice e crediti su GitHub</a>. Modelli 3D di Enrico Dalbosco (3D Warehouse); foto da Wikimedia Commons.</p>
+</div></main>
+</body>
+</html>

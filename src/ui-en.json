@@ -8,7 +8,6 @@
   ["`Modelli 3D ${W3(", "`3D models ${W3("],
   ["} di Enrico Dalbosco (Arrigo Silva), 3D Warehouse`", "} by Enrico Dalbosco (Arrigo Silva), 3D Warehouse`"],
   ["<dt class=\"cred\">Crediti delle immagini</dt><dd>Foto e riproduzioni da Wikimedia Commons, usate secondo la loro licenza.", "<dt class=\"cred\">Image credits</dt><dd>Photos and reproductions from Wikimedia Commons, used under their licences."],
-  ["<title>La basilica di Santa Maria del Fiore</title>", "<title>The basilica of Santa Maria del Fiore</title>"],
   ["Santa Maria del Fiore · <em>la basilica</em>", "Santa Maria del Fiore · <em>the basilica</em>"],
   ["href=\"cupola-basilica-en.html\" lang=\"en\">English", "href=\"cupola-basilica.html\" lang=\"it\">Italiano"],
   ["href=\"cupola-basilica.html\"><span class=\"lbl\">La basilica</span>", "href=\"cupola-basilica-en.html\"><span class=\"lbl\">The basilica</span>"],
@@ -30,8 +29,6 @@
   ["href=\"cupola-cantiere.html\"><span class=\"lbl\">Il cantiere</span>", "href=\"cupola-cantiere-en.html\"><span class=\"lbl\">The building site</span>"],
   ["href=\"cupola-cantiere-en.html\" lang=\"en\">English", "href=\"cupola-cantiere.html\" lang=\"it\">Italiano"],
   ["href=\"cupola-racconto-en.html\" lang=\"en\">English", "href=\"cupola-racconto.html\" lang=\"it\">Italiano"],
-  ["<title>Il cantiere della cupola di Brunelleschi</title>", "<title>The building site of Brunelleschi's dome</title>"],
-  ["<title>Il racconto della cupola di Brunelleschi</title>", "<title>The story of Brunelleschi's dome</title>"],
   ["<h1>La cupola di <em>Brunelleschi</em> · il cantiere</h1>", "<h1><em>Brunelleschi</em>'s dome · the building site</h1>"],
   ["<h1>La cupola di <em>Brunelleschi</em> · il racconto</h1>", "<h1><em>Brunelleschi</em>'s dome · the story</h1>"],
   ["Trascina: ruota · frecce e Pag su/giù: muoviti · Q/E: girati · rotella: avvicina · doppio clic: vai lì", "Drag: rotate · arrows and Page Up/Down: move · Q/E: turn · wheel: zoom · double-click: go there"],
@@ -111,5 +108,7 @@
   ["Girati a sinistra (Q)", "Turn left (Q)"],
   ["Girati a destra (E)", "Turn right (E)"],
   ["Girati a sinistra", "Turn left"],
-  ["Girati a destra", "Turn right"]
+  ["Girati a destra", "Turn right"],
+  ["Codice sorgente su GitHub (open source)", "Source code on GitHub (open source)"],
+  ["Codice sorgente su GitHub", "Source code on GitHub"]
 ]
